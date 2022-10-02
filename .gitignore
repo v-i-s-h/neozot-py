@@ -131,3 +131,6 @@ dmypy.json
 
 # Data folder
 data/
+
+# Workspace
+*.code-workspace
