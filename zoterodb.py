@@ -4,6 +4,7 @@
 
 import os
 import sqlite3
+import itertools
 
 
 class ZoteroDB:
@@ -25,6 +26,16 @@ class ZoteroDB:
 
         # Connect to DB
         self._connect_db() 
+
+    def _connect_db(self):
+        db = os.path.join(self.db_dir, 'zotero.sqlite')
+        if not os.path.exists(db):
+            raise OSError("No database found at: {}".format(self.db_dir))
+        
+        # Connect
+        self._connection = sqlite3.connect(db)
+        self._connection.row_factory = sqlite3.Row
+        print("Connected to db")
 
     def _load_collections(self):
         conn = self.connection
@@ -68,7 +79,8 @@ class ZoteroDB:
         q = """
         SELECT itemID, itemTypeID, key
         FROM items
-        WHERE itemTypeID IN ({})
+        WHERE itemTypeID IN ({}) 
+        AND itemID NOT IN (SELECT itemId FROM deletedItems)
         """.format(','.join(['?'] * len(reqItemTypeCodes)))
 
         items = {}
@@ -92,8 +104,29 @@ class ZoteroDB:
                 itemInfo['fieldName']: itemInfo['value']
             })
 
-        return items
 
+        q = """
+        SELECT ic.itemID, ic.creatorID, c.firstName, c.lastName
+        FROM itemCreators ic
+        LEFT JOIN creators c ON ic.creatorID = c.creatorID
+        WHERE ic.itemID IN ({})
+        """.format(','.join(['?'] * len(reqItemIDs)))
+        for itemID, creatorInfo in itertools.groupby(
+                conn.execute(q, reqItemIDs),
+                key=lambda i: i['itemID']
+            ):
+            _creators = []
+            _creatorIDs = []
+            for info in creatorInfo:
+                _creatorName = "{} {}".format(info['firstName'], info['lastName'])
+                _creators.append(_creatorName)
+                _creatorIDs.append(info['creatorID'])
+            items[itemID].update({
+                'creators': _creators,
+                'creatorIDs': _creatorIDs
+            })
+
+        return items
 
     def get_library(self):
         """
@@ -106,17 +139,6 @@ class ZoteroDB:
         items = self.items
         
         return items
-
-    def _connect_db(self):
-        db = os.path.join(self.db_dir, 'zotero.sqlite')
-        if not os.path.exists(db):
-            raise OSError("No database found at: {}".format(self.db_dir))
-        
-        # Connect
-        self._connection = sqlite3.connect(db)
-        self._connection.row_factory = sqlite3.Row
-        print("Connected to db")
-
 
     @property
     def connection(self):

@@ -12,11 +12,12 @@ def main():
 
     library = zotdb.get_library()
 
-    for i, (key, info) in enumerate(library.items()):
-        print(key, info)
-
-        if i > 9: 
-            break
+    for i, (id, info) in enumerate(library.items()):
+        buffer = "{:4d}\n".format(i)
+        buffer += "        id              : {:4d}\n".format(id)
+        for k, v in info.items():
+            buffer += "        {:16s}: {}\n".format(k, v)
+        print(buffer)
 
 
 if __name__=="__main__":
