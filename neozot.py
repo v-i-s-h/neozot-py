@@ -17,11 +17,11 @@ def main():
 
     zotdb = ZoteroDB(datadir)
     library = zotdb.get_library()
-    display_items(library)
+    # display_items(library)
     
     arxiv = ArxivFeedProvider()
     feed = arxiv.get_feed_summary()
-    display_items(feed)
+    # display_items(feed)
 
     # Build a summary of each item, only if it has abstract
     items_summary = build_summary(library)
@@ -39,8 +39,8 @@ def main():
         lowercase=True,
         analyzer='word',
         stop_words='english',
-        max_df=0.25,
-        min_df=10,
+        max_df=0.20,
+        min_df=0.02,
         norm='l2',
         use_idf=True
     )
@@ -72,6 +72,18 @@ def main():
         print(feed[feed_id])
         print("Score: ", feed_similarity[i, j], i, j)
         print("----")
+
+
+    # Print feed similarity
+    n_feed = len(feed_summary)
+    n_items = len(items_summary)
+    for i, (id, info) in enumerate(library.items()):
+        print("{:3d}. {}".format(i+1, info['title']))
+    for i, (id, info) in enumerate(feed.items()):
+        print("{:3d}.        ".format(i+1), end='')
+        for j in range(n_items):
+            print("{:.4f}    ".format(feed_similarity[j, i]), end='')
+        print(info['title'])
 
 
 

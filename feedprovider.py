@@ -50,6 +50,7 @@ class ArxivFeedProvider:
             with open(outfile + ".header.json", 'w') as f:
                 json.dump(dict(r.headers), f)
             status = True
+        # status = True
 
         return status
 
