@@ -110,7 +110,9 @@ class ZoteroDB:
         )
 
         for itemInfo in conn.execute(q, reqItemIDs):
-            items[itemInfo["itemID"]].update({itemInfo["fieldName"]: itemInfo["value"]})
+            items[itemInfo["itemID"]].update(
+                {itemInfo["fieldName"]: itemInfo["value"]}
+            )
 
         q = """
         SELECT ic.itemID, ic.creatorID, c.firstName, c.lastName
@@ -126,10 +128,14 @@ class ZoteroDB:
             _creators = []
             _creatorIDs = []
             for info in creatorInfo:
-                _creatorName = "{} {}".format(info["firstName"], info["lastName"])
+                _creatorName = "{} {}".format(
+                    info["firstName"], info["lastName"]
+                )
                 _creators.append(_creatorName)
                 _creatorIDs.append(info["creatorID"])
-            items[itemID].update({"creators": _creators, "creatorIDs": _creatorIDs})
+            items[itemID].update(
+                {"creators": _creators, "creatorIDs": _creatorIDs}
+            )
 
         return items
 

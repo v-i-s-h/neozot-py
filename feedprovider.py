@@ -10,6 +10,7 @@ import xml.etree.ElementTree as ET
 import re
 import logging
 
+
 class ArxivFeedProvider:
     def __init__(self, domains=None, feeddir="feeds/") -> None:
         default_domains = ["cs.AI", "cs.CV", "cs.LG"]
@@ -43,7 +44,11 @@ class ArxivFeedProvider:
                 if status_ok:
                     feedfiles.append(outfile)
                 else:
-                    logging.error("ERROR downloading {}. Status: {}".format(domain, status_ok))
+                    logging.error(
+                        "ERROR downloading {}. Status: {}".format(
+                            domain, status_ok
+                        )
+                    )
 
         # return all feed files
         return feedfiles

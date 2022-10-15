@@ -24,7 +24,8 @@ def main():
     parser.add_argument(
         "-d",
         "--domains",
-        help="arxiv domain to search in (ex: cs.LG, cs.CV, cs.AI etc",
+        help="""arxiv domain(s) to search in """
+        """(Ex: cs.LG cs.CV cs.AI or high level as cs, math etc)""",
         nargs="+",
     )
     parser.add_argument("-f", "--force-refresh", action="store_true")
@@ -46,11 +47,17 @@ def main():
     # Build a summary of each item, only if it has abstract
     items_summary = build_summary(library)
     logging.info(
-        "Created summary for {}/{} documents.".format(len(items_summary), len(library))
+        "Created summary for {}/{} documents.".format(
+            len(items_summary), len(library)
+        )
     )
 
     feed_summary = build_summary(feed)
-    logging.info("Created summary for {}/{} feed items.".format(len(feed_summary), len(feed)))
+    logging.info(
+        "Created summary for {}/{} feed items.".format(
+            len(feed_summary), len(feed)
+        )
+    )
 
     # Create feature builder
     encoder = TfidfVectorizer(
@@ -75,7 +82,8 @@ def main():
     K = 10
     top_K = np.c_[
         np.unravel_index(
-            np.argpartition(feed_similarity.ravel(), -K)[-K:], feed_similarity.shape
+            np.argpartition(feed_similarity.ravel(), -K)[-K:],
+            feed_similarity.shape,
         )
     ]
 
