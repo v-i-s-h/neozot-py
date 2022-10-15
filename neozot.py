@@ -2,6 +2,9 @@
     Neozot
 """
 
+import argparse
+import json
+
 from zoterodb import ZoteroDB
 from feedprovider import ArxivFeedProvider
 
@@ -13,14 +16,27 @@ from sklearn.metrics.pairwise import linear_kernel as similarity
 
 
 def main():
-    datadir = "data/"
+    parser = argparse.ArgumentParser(prog="neozot", 
+                description="Super charge your zotero")
+    parser.add_argument("datadir", help="Data directory of Zotero", type=str)
+    parser.add_argument('-d', "--domains", 
+                help="arxiv domain to search in (ex: cs.LG, cs.CV, cs.AI etc", 
+                nargs='+')
+    parser.add_argument('-f', "--force-refresh", action='store_true')
+    parser.set_defaults(force_refresh=False)
+    args = parser.parse_args()
+    print(args)
+
+    datadir = args.datadir
+    arxivdomains = args.domains
+    force_refresh = args.force_refresh
 
     zotdb = ZoteroDB(datadir)
     library = zotdb.get_library()
     # display_items(library)
     
-    arxiv = ArxivFeedProvider()
-    feed = arxiv.get_feed_summary()
+    arxiv = ArxivFeedProvider(domains=arxivdomains)
+    feed = arxiv.get_feed_summary(force_refresh=force_refresh)
     # display_items(feed)
 
     # Build a summary of each item, only if it has abstract
@@ -83,7 +99,7 @@ def main():
         print("{:3d}.        ".format(i+1), end='')
         for j in range(n_items):
             print("{:.4f}    ".format(feed_similarity[j, i]), end='')
-        print(info['title'])
+        print("{:120s}  {:30s}".format(info['title'], info['link']))
 
 
 

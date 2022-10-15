@@ -11,12 +11,16 @@ import re
 
 
 class ArxivFeedProvider:
-    def __init__(self, domains=['cs.AI', 'cs.CV', 'cs.LG'], feeddir="feeds/") -> None:
+    def __init__(self, domains=None, feeddir="feeds/") -> None:
+        default_domains = ['cs.AI', 'cs.CV', 'cs.LG']
         self.baseurl = "http://arxiv.org/rss/"
-        self.domains = domains
+        if domains is not None:
+            self.domains = domains
+        else:
+            self.domains = default_domains
         self.feeddir = feeddir
 
-    def _download_feeds(self):
+    def _download_feeds(self, force_refresh=False):
         """
             Download recent feeds
         """
@@ -26,12 +30,20 @@ class ArxivFeedProvider:
         os.makedirs(outdir, exist_ok=True)
 
         feedfiles = []
-        for domain in self.domains[:2]:
+        for domain in self.domains:
             feedurl = self.baseurl + domain
             outfile = os.path.join(outdir, domain + ".xml")
-            status_ok = self._download_feed(feedurl, outfile)
-            if status_ok:
+            # If file exists, do not download
+            if os.path.exists(outfile) and not force_refresh:
+                print("Feed cache found {}".format(outfile))
                 feedfiles.append(outfile)
+            else:
+                print("Downloading feeds for domain {}".format(domain))
+                status_ok = self._download_feed(feedurl, outfile)
+                if status_ok:
+                    feedfiles.append(outfile)
+                else:
+                    print("ERROR downloading {}. Status: {}".format(domain, status_ok))
 
         # return all feed files
         return feedfiles
@@ -50,8 +62,7 @@ class ArxivFeedProvider:
             with open(outfile + ".header.json", 'w') as f:
                 json.dump(dict(r.headers), f)
             status = True
-        # status = True
-
+        
         return status
 
     def _parse_feed(self, feedfile):
@@ -104,9 +115,9 @@ class ArxivFeedProvider:
 
         return feed_items
 
-    def get_feed_summary(self):
+    def get_feed_summary(self, force_refresh=False):
 
-        feed_files = self._download_feeds()
+        feed_files = self._download_feeds(force_refresh)
         feeditems = {}
         
         for feedfile in feed_files:
