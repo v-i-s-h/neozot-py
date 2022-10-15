@@ -8,30 +8,25 @@ import itertools
 
 
 class ZoteroDB:
-    """
+    """ """
 
-    """
     def __init__(self, data_dir):
-        """
-
-        """
+        """ """
         self.db_dir = data_dir
-        
+
         # Load on demand
         self._connection = None
         self._collections = None
         self._items = None
 
-
-
         # Connect to DB
-        self._connect_db() 
+        self._connect_db()
 
     def _connect_db(self):
-        db = os.path.join(self.db_dir, 'zotero.sqlite')
+        db = os.path.join(self.db_dir, "zotero.sqlite")
         if not os.path.exists(db):
             raise OSError("No database found at: {}".format(self.db_dir))
-        
+
         # Connect
         self._connection = sqlite3.connect(db)
         self._connection.row_factory = sqlite3.Row
@@ -48,9 +43,9 @@ class ZoteroDB:
 
         collections = {}
         for c in conn.execute(q):
-            collections[c['collectionID']] = {
-                'name': c['collectionName'],
-                'parentID': c['parentCollectionId']
+            collections[c["collectionID"]] = {
+                "name": c["collectionName"],
+                "parentID": c["parentCollectionId"],
             }
 
         return collections
@@ -59,35 +54,47 @@ class ZoteroDB:
         conn = self.connection
 
         reqItemTypes = [
-            'book', 'bookSection', 'conferencePaper', 'document',
-            'journalArticle', 'letter', 'magazineArticle', 'manuscript',
-            'preprint', 'report', 'thesis',
+            "book",
+            "bookSection",
+            "conferencePaper",
+            "document",
+            "journalArticle",
+            "letter",
+            "magazineArticle",
+            "manuscript",
+            "preprint",
+            "report",
+            "thesis",
             # 'attachment', 'note'
         ]
         q = """
         SELECT itemTypeID, typeName
         FROM itemTypes
         WHERE typeName IN ({})
-        """.format(','.join(['?'] * len(reqItemTypes)))
+        """.format(
+            ",".join(["?"] * len(reqItemTypes))
+        )
 
         reqItemTypeCodes = []
         itemTypeLookup = {}
         for itemType in conn.execute(q, reqItemTypes):
-            itemTypeLookup[itemType['itemTypeID']] = itemType['typeName']
-            reqItemTypeCodes.append(itemType['itemTypeID'])
+            itemTypeLookup[itemType["itemTypeID"]] = itemType["typeName"]
+            reqItemTypeCodes.append(itemType["itemTypeID"])
 
         q = """
         SELECT itemID, itemTypeID, key
         FROM items
         WHERE itemTypeID IN ({}) 
         AND itemID NOT IN (SELECT itemId FROM deletedItems)
-        """.format(','.join(['?'] * len(reqItemTypeCodes)))
+        """.format(
+            ",".join(["?"] * len(reqItemTypeCodes))
+        )
 
         items = {}
         for item in conn.execute(q, reqItemTypeCodes):
-            items[item['itemID']] = {
-                'type': itemTypeLookup[item['itemTypeID']],
-                'key': item['key']
+            items[item["itemID"]] = {
+                "type": itemTypeLookup[item["itemTypeID"]],
+                "key": item["key"],
             }
 
         reqItemIDs = list(items.keys())
@@ -97,47 +104,42 @@ class ZoteroDB:
         LEFT JOIN fields ON id.fieldID = fields.fieldID
         LEFT JOIN itemDataValues idv ON id.valueID = idv.valueID
         WHERE id.itemID IN ({})
-        """.format(','.join(['?'] * len(reqItemIDs)))
+        """.format(
+            ",".join(["?"] * len(reqItemIDs))
+        )
 
         for itemInfo in conn.execute(q, reqItemIDs):
-            items[itemInfo['itemID']].update({
-                itemInfo['fieldName']: itemInfo['value']
-            })
-
+            items[itemInfo["itemID"]].update({itemInfo["fieldName"]: itemInfo["value"]})
 
         q = """
         SELECT ic.itemID, ic.creatorID, c.firstName, c.lastName
         FROM itemCreators ic
         LEFT JOIN creators c ON ic.creatorID = c.creatorID
         WHERE ic.itemID IN ({})
-        """.format(','.join(['?'] * len(reqItemIDs)))
+        """.format(
+            ",".join(["?"] * len(reqItemIDs))
+        )
         for itemID, creatorInfo in itertools.groupby(
-                conn.execute(q, reqItemIDs),
-                key=lambda i: i['itemID']
-            ):
+            conn.execute(q, reqItemIDs), key=lambda i: i["itemID"]
+        ):
             _creators = []
             _creatorIDs = []
             for info in creatorInfo:
-                _creatorName = "{} {}".format(info['firstName'], info['lastName'])
+                _creatorName = "{} {}".format(info["firstName"], info["lastName"])
                 _creators.append(_creatorName)
-                _creatorIDs.append(info['creatorID'])
-            items[itemID].update({
-                'creators': _creators,
-                'creatorIDs': _creatorIDs
-            })
+                _creatorIDs.append(info["creatorID"])
+            items[itemID].update({"creators": _creators, "creatorIDs": _creatorIDs})
 
         return items
 
     def get_library(self):
-        """
-
-        """
+        """ """
         library = {}
 
         conn = self.connection
         collections = self.collections
         items = self.items
-        
+
         return items
 
     @property
@@ -145,14 +147,14 @@ class ZoteroDB:
         if self._connection is None:
             # attempt to connect
             self._connect_db()
-        
+
         return self._connection
 
     @property
     def collections(self):
         if self._collections is None:
             self._collections = self._load_collections()
-        
+
         return self._collections
 
     @property
