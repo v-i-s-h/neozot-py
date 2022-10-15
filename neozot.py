@@ -4,6 +4,7 @@
 
 import argparse
 import json
+import logging
 
 from zoterodb import ZoteroDB
 from feedprovider import ArxivFeedProvider
@@ -29,7 +30,6 @@ def main():
     parser.add_argument("-f", "--force-refresh", action="store_true")
     parser.set_defaults(force_refresh=False)
     args = parser.parse_args()
-    print(args)
 
     datadir = args.datadir
     arxivdomains = args.domains
@@ -45,12 +45,12 @@ def main():
 
     # Build a summary of each item, only if it has abstract
     items_summary = build_summary(library)
-    print(
+    logging.info(
         "Created summary for {}/{} documents.".format(len(items_summary), len(library))
     )
 
     feed_summary = build_summary(feed)
-    print("Created summary for {}/{} feed items.".format(len(feed_summary), len(feed)))
+    logging.info("Created summary for {}/{} feed items.".format(len(feed_summary), len(feed)))
 
     # Create feature builder
     encoder = TfidfVectorizer(
@@ -126,4 +126,9 @@ def build_summary(library):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(message)s",
+        datefmt="%d-%m-%Y %H:%M:%S",
+    )
     main()

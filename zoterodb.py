@@ -5,6 +5,7 @@
 import os
 import sqlite3
 import itertools
+import logging
 
 
 class ZoteroDB:
@@ -30,7 +31,7 @@ class ZoteroDB:
         # Connect
         self._connection = sqlite3.connect(db)
         self._connection.row_factory = sqlite3.Row
-        print("Connected to db")
+        logging.info("Connected to db")
 
     def _load_collections(self):
         conn = self.connection

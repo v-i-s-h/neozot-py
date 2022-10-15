@@ -8,7 +8,7 @@ import requests
 import json
 import xml.etree.ElementTree as ET
 import re
-
+import logging
 
 class ArxivFeedProvider:
     def __init__(self, domains=None, feeddir="feeds/") -> None:
@@ -35,15 +35,15 @@ class ArxivFeedProvider:
             outfile = os.path.join(outdir, domain + ".xml")
             # If file exists, do not download
             if os.path.exists(outfile) and not force_refresh:
-                print("Feed cache found {}".format(outfile))
+                logging.info("Feed cache found {}".format(outfile))
                 feedfiles.append(outfile)
             else:
-                print("Downloading feeds for domain {}".format(domain))
+                logging.info("Downloading feeds for domain {}".format(domain))
                 status_ok = self._download_feed(feedurl, outfile)
                 if status_ok:
                     feedfiles.append(outfile)
                 else:
-                    print("ERROR downloading {}. Status: {}".format(domain, status_ok))
+                    logging.error("ERROR downloading {}. Status: {}".format(domain, status_ok))
 
         # return all feed files
         return feedfiles
