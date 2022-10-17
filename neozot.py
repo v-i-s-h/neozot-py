@@ -101,16 +101,31 @@ def main():
         print("Score: ", feed_similarity[i, j], i, j)
         print("----")
 
-    # Print feed similarity
-    n_feed = len(feed_summary)
-    n_items = len(items_summary)
-    for i, (id, info) in enumerate(library.items()):
-        print("{:3d}. {}".format(i + 1, info["title"]))
-    for i, (id, info) in enumerate(feed.items()):
-        print("{:3d}.        ".format(i + 1), end="")
-        for j in range(n_items):
-            print("{:.4f}    ".format(feed_similarity[j, i]), end="")
-        print("{:120s}  {:30s}".format(info["title"], info["link"]))
+    # ## Alternative scoring
+    # mean_scores = feed_similarity.mean(axis=0)
+    # top_K = np.argpartition(mean_scores, -K)[-K:]
+
+    # for idx in top_K:
+    #     feed_id = ids_feed[idx]
+    #     feed_item = feed[feed_id]
+    #     print(feed_item["title"])
+    #     print("\t" + feed_item["abstractNote"])
+    #     print("Score = ", mean_scores[idx])
+
+    # # Print feed similarity
+    # n_feed = len(feed_summary)
+    # n_items = len(items_summary)
+    # for i, (id, info) in enumerate(library.items()):
+    #     print("{:3d}. {}".format(i + 1, info["title"]))
+    # for i, (id, info) in enumerate(feed.items()):
+    #     print("{:3d}.    ".format(i + 1), end="")
+    #     for j in range(n_items):
+    #         print("{:.4f}    ".format(feed_similarity[j, i]), end="")
+    #     print(
+    #         "[{:.4f}] {} ".format(mean_scores[i], "*" if i in top_K else " "),
+    #         end="",
+    #     )
+    #     print("{:120s}  {:30s}".format(info["title"], info["link"]))
 
 
 def display_items(library):
