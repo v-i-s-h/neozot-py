@@ -2,19 +2,18 @@
     Neozot
 """
 
-import os
 import argparse
 import logging
-from datetime import datetime
 
 from zoterodb import ZoteroDB
 from feedprovider import ArxivFeedProvider
 from recommender import Recommender
 
-import jinja2
+import eel
 
 
-def main():
+@eel.expose
+def get_arxiv_suggestions():
     parser = argparse.ArgumentParser(
         prog="neozot", description="Super charge your zotero"
     )
@@ -46,35 +45,18 @@ def main():
     rec = Recommender()
     suggested_items = rec.get_recommendations(library, feed, K=20)
 
-    # Write out to html file
-    timestamp = datetime.now().strftime("%Y-%m-%d")
-    outfile = os.path.join("feeds", timestamp, args.outfile)
-
-    env = jinja2.Environment(loader=jinja2.FileSystemLoader("templates/"))
-    template = env.get_template("results.html")
-
-    content = template.render({"feeditems": suggested_items})
-    with open(outfile, mode='w', encoding='utf-8') as f:
-        f.write(content)
-    
+    return suggested_items
 
 
-def display_items(library):
-    for i, (id, info) in enumerate(library.items()):
-        buffer = "{:4d}\n".format(i)
-        buffer += "        id              : {}\n".format(id)
-        for k, v in info.items():
-            buffer += "        {:16s}: {}\n".format(k, v)
-        print(buffer)
-
-
-
+def main():    
+    eel.init("ui")
+    eel.start("index.html")
 
 
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(message)s",
-        datefmt="%d-%m-%Y %H:%M:%S",
+        datefmt="%Y-%m-%d %H:%M:%S",
     )
     main()

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>neozot</title>
+        <script type="text/javascript" src="/eel.js"></script>
+        <script src="//unpkg.com/alpinejs" defer></script>
+    </head>
+    <body x-data>
+        <template x-for="item in eel.get_arxiv_suggestions()">
+            <div x-data="item">
+                <a x-bind:href="link"><h3 x-text="title"></h3></a>
+                <p x-text="abstractNote"></p>
+                <div style="margin-left: 40px">
+                    <h4 x-text="related.title"></h4>
+                    <p x-text="related.abstractNote"></p>
+                    <p>Score = <em x-text="score"></em></p>
+                </div>
+            </div>
+        </template>
+    </body>
+</html>
