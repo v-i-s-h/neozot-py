@@ -7,8 +7,8 @@
         <script src="//unpkg.com/alpinejs" defer></script>
         <link rel="stylesheet" href="style.css">
     </head>
-    <body x-data style="max-width:80%; margin:0 auto;">
-        <h1>Recommendations</h1>
+    <body x-data style="max-width:80%; margin:5% auto; background-color: whitesmoke;">
+        <h1>neozot</h1>
         <template x-for="item in eel.get_arxiv_suggestions()">
             <div x-data="item" class="card">
                 <a x-bind:href="link" target="_blank"><h3 x-text="title"></h3></a>
