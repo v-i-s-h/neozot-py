@@ -68,7 +68,6 @@ class Recommender:
         # For feed, the key itself can be index, but just creating the map
         ids_feed = list(feed_summary.keys())
 
-
         recommendations = []
         for i, j in top_K:
             item_id = ids_library[i]
@@ -82,6 +81,11 @@ class Recommender:
             _item.update({"score": feed_similarity[i, j]})
             _item.update({"related": library[item_id]})
             recommendations.append(_item)
+
+        # sort according to score
+        recommendations = sorted(
+            recommendations, key=lambda x: x["score"], reverse=True
+        )
 
         return recommendations
 
