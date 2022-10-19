@@ -23,7 +23,6 @@
   display: none !important;
 }
 
-
 /* Center the loader */
 #loader {
   position: absolute;
@@ -68,6 +67,23 @@
   from{ bottom:-100px; opacity:0 } 
   to{ bottom:0; opacity:1 }
 }
+
+header {
+  background: #fff;
+  position: fixed;
+  padding: 1em;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 99;
+  box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.5);
+}
+
+/* header {
+  position: sticky;   
+  top: 0; 
+  z-index: 99;
+} */
 
 .title {
   font-family:'Roboto';

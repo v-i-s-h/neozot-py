@@ -14,13 +14,16 @@
             }
         </script>
     </head>
-    <body x-data style="max-width:80%; margin:5% auto; background-color: whitesmoke;">
-        <div class="title">neozot</div>
+    <body x-data style="background-color: whitesmoke;">
+        <header>
+            <div class="title">neozot</div>
+        </header>
         <div
             x-cloak
             x-data="{suggested_items: [], 'isLoading': true}"
             x-init="load_suggestions()
                 .then(results => { suggested_items = results; isLoading = false;})"
+            style="max-width:80%; margin: 6em auto;"
         >
             <div x-show="isLoading" id="loader"></div>
             <template x-for="item in suggested_items">
