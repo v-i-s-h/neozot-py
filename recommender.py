@@ -1,6 +1,7 @@
 # Recommendation engine
 
 import logging
+from copy import deepcopy
 
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -33,7 +34,7 @@ class Recommender:
             use_idf=True,
         )
 
-    def get_recommendations(self, library, feed, K=10):
+    def get_recommendations(self, library, feed, K=5):
         # Build a summary of each item, only if it has abstract
         items_summary = build_summary(library)
         logging.info(
@@ -49,10 +50,25 @@ class Recommender:
             )
         )
 
-        items_embedding = self.encoder.fit_transform(items_summary.values())
-        feed_embedding = self.encoder.transform(feed_summary.values())
+        # Creating list of mappings
+        items_summary_ids = []
+        items_summary_values = []
+        for id, val in items_summary.items():
+            items_summary_ids.append(id)
+            items_summary_values.append(val)
+        feed_summary_ids = []
+        feed_summary_values = []
+        for id, val in feed_summary.items():
+            feed_summary_ids.append(id)
+            feed_summary_values.append(val)
+
+        items_embedding = self.encoder.fit_transform(items_summary_values)
+        feed_embedding = self.encoder.transform(feed_summary_values)
 
         feed_similarity = similarity(items_embedding, feed_embedding)
+        # Feed similarity matrix is a matrix of dimension
+        #       items x feeds
+        # We find top K entries in the matrix to find top K pairs
 
         # Get top K pairs
         # Ref: https://stackoverflow.com/a/57105712
@@ -63,23 +79,17 @@ class Recommender:
             )
         ]
 
-        # Index to id mapping for library
-        ids_library = list(items_summary.keys())
-        # For feed, the key itself can be index, but just creating the map
-        ids_feed = list(feed_summary.keys())
-
         recommendations = []
         for i, j in top_K:
-            item_id = ids_library[i]
-            feed_id = ids_feed[j]
+            item_id = items_summary_ids[i]
+            feed_id = feed_summary_ids[j]
 
-            # print(library[item_id])
-            # print(feed[feed_id])
-            # print("Score: ", feed_similarity[i, j], i, j)
-            # print("----")
-            _item = feed[feed_id]
+            # Deep copy is required, otherwise we will be modifying the original
+            # entry itself later
+            _item = deepcopy(feed[feed_id])
             _item.update({"score": feed_similarity[i, j]})
-            _item.update({"related": library[item_id]})
+            _item.update({"related": deepcopy(library[item_id])})
+
             recommendations.append(_item)
 
         # sort according to score
