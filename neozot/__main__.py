@@ -5,9 +5,9 @@
 import argparse
 import logging
 
-from zoterodb import ZoteroDB
-from feedprovider import ArxivFeedProvider
-from recommender import Recommender
+from .zoterodb import ZoteroDB
+from .feedprovider import ArxivFeedProvider
+from .recommender import Recommender
 
 import eel
 
@@ -15,7 +15,7 @@ import eel
 @eel.expose
 def get_arxiv_suggestions():
     parser = argparse.ArgumentParser(
-        prog="neozot", description="Super charge your zotero"
+        prog="neozot", description="Super charge your research"
     )
     parser.add_argument("datadir", help="Data directory of Zotero", type=str)
     parser.add_argument(
@@ -49,7 +49,7 @@ def get_arxiv_suggestions():
 
 
 def main():    
-    eel.init("ui")
+    eel.init("neozot/ui")
     eel.start("index.html")
 
 
