@@ -13,7 +13,7 @@ import logging
 
 class ArxivFeedProvider:
     def __init__(self, domains=None, feeddir="feeds/") -> None:
-        default_domains = ["cs.AI", "cs.CV", "cs.LG"]
+        default_domains = ["cs"]
         self.baseurl = "http://arxiv.org/rss/"
         if domains is not None:
             self.domains = domains
