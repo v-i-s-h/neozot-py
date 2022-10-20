@@ -33,12 +33,17 @@
                             <h3 x-text="title"></h3>
                         </a>
                     </div>
+                    <div class="card-creators">
+                        <template x-for="creator in creators">
+                            <p x-text="creator" class="creator"></p>
+                        </template>
+                    </div>
                     <div class="card-text">
-                        <p x-text="abstractNote"></p>
+                        <div x-text="abstractNote"></div>
                     </div>
                     <div class="card-related">
                         <p x-text="related.title" style="font-weight: bolder;"></p>
-                        <p x-text="related.abstractNote"></p>
+                        <div x-text="related.abstractNote"></div>
                         <p>Score = <em x-text="score"></em></p>
                     </div>
                 </div>

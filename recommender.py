@@ -34,7 +34,7 @@ class Recommender:
             use_idf=True,
         )
 
-    def get_recommendations(self, library, feed, K=5):
+    def get_recommendations(self, library, feed, K=10):
         # Build a summary of each item, only if it has abstract
         items_summary = build_summary(library)
         logging.info(

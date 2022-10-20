@@ -19,25 +19,35 @@
   box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
 }
 
-.card-title {
+.card .card-title {
   font-family: 'Times New Roman', Times, serif;
   color: #f3f3f3;
   padding: 2px 16px;
   background-color: #3498db;
 }
 
-.card-title a:link {
+.card .card-creators {
+  padding: 2px 16px;
+  font-style: italic;
+}
+
+.card .card-creators .creator {
+  display: inline-block;
+  margin-right:16px;
+}
+
+.card .card-title a:link {
   color: #ffffff;
 }
-.card-title a:visited {
+.card .card-title a:visited {
   color: #f0f0f0;
 }
 
-.card-text {
+.card .card-text {
   padding: 2px 16px;
 }
 
-.card-related {
+.card .card-related {
   margin-left: 40px;
   padding: 2px 16px;
 }
@@ -93,6 +103,7 @@
 
 header {
   background: #fff;
+  color: #3498db;
   position: fixed;
   padding: 1em;
   top: 0;
