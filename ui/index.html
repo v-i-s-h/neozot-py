@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>neozot</title>
         <script type="text/javascript" src="eel.js"></script>
-        <script src="//unpkg.com/alpinejs" defer></script>
+        <script src="https://unpkg.com/alpinejs" defer></script>
         <link rel="stylesheet" href="style.css">
         <script>
             async function load_suggestions() {
@@ -28,10 +28,16 @@
             <div x-show="isLoading" id="loader"></div>
             <template x-for="item in suggested_items">
                 <div x-data="item" class="card">
-                    <a x-bind:href="link" target="_blank"><h3 x-text="title"></h3></a>
-                    <p x-text="abstractNote"></p>
-                    <div style="margin-left: 40px">
-                        <h4 x-text="related.title"></h4>
+                    <div class="card-title">
+                        <a x-bind:href="link" target="_blank">
+                            <h3 x-text="title"></h3>
+                        </a>
+                    </div>
+                    <div class="card-text">
+                        <p x-text="abstractNote"></p>
+                    </div>
+                    <div class="card-related">
+                        <p x-text="related.title" style="font-weight: bolder;"></p>
                         <p x-text="related.abstractNote"></p>
                         <p>Score = <em x-text="score"></em></p>
                     </div>
