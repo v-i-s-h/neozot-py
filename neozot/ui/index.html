@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="style.css">
     <script>
         async function load_suggestions(n_items, domains) {
-            console.log("N =", n_items)
-            console.log("domains =", domains)
             n_items = parseInt(n_items)
             let _items = await eel.get_arxiv_suggestions(domains, n_items)();
             window.dispatchEvent(
@@ -37,7 +35,14 @@
         <div class="title">neozot</div>
     </header>
     <div class="sidenav">
-        <a href="#"><i class="fa fa-home"></i></a>
+        <a href="#"><i class="fa fa-inbox"></i></a>
+        <a href="#"><i class="fa fa-compass"></i></a>
+        <a href="#"><i class="fa fa-bookmark"></i></a>
+        <a href="https://github.com/v-i-s-h/neozot-py/"
+            target="_blank"
+            style="bottom: 43px; position: fixed;">
+            <i class="fa fa-github"></i>
+        </a>
         <a href="#" style="bottom: 5px; position: fixed;">
             <i class="fa fa-gear" x-on:click="isModalOpen = true"></i>
         </a>
