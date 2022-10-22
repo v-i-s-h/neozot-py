@@ -38,7 +38,7 @@ def main():
     # display_items(library)
 
     @eel.expose
-    def get_arxiv_suggestions(domains, n_items=5):
+    def get_arxiv_suggestions(domains=arxivdomains, n_items=5):
         print("Request: ", domains, n_items)
         nonlocal library
         if library is None:

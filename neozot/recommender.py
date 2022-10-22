@@ -97,18 +97,24 @@ class Recommender:
             recommendations, key=lambda x: x["score"], reverse=True
         )
 
-        return recommendations
+        ## Alternative scoring
+        scores = feed_similarity.sum(axis=0)
+        top_K = np.argpartition(scores, -K)[-K:]
 
-        # ## Alternative scoring
-        # mean_scores = feed_similarity.mean(axis=0)
-        # top_K = np.argpartition(mean_scores, -K)[-K:]
+        recommendations = []
+        for idx in top_K:
+            feed_id = feed_summary_ids[idx]
+            
+            _item = deepcopy(feed[feed_id])
+            _item.update({"score": scores[idx]})
+            _item.update({"related": ""})
 
-        # for idx in top_K:
-        #     feed_id = ids_feed[idx]
-        #     feed_item = feed[feed_id]
-        #     print(feed_item["title"])
-        #     print("\t" + feed_item["abstractNote"])
-        #     print("Score = ", mean_scores[idx])
+            recommendations.append(_item)
+
+        # sort according to score
+        recommendations = sorted(
+            recommendations, key=lambda x: x["score"], reverse=True
+        )
 
         # # Print feed similarity
         # n_feed = len(feed_summary)
@@ -124,3 +130,5 @@ class Recommender:
         #         end="",
         #     )
         #     print("{:120s}  {:30s}".format(info["title"], info["link"]))
+
+        return recommendations
