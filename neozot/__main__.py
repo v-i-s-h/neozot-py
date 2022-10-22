@@ -55,7 +55,7 @@ def main():
         return suggested_items
 
     eel.init("neozot/ui")
-    eel.start("index.html")
+    eel.start("")
 
 
 if __name__ == "__main__":
