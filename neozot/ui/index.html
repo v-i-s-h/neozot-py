@@ -13,42 +13,50 @@
                 return suggested_items;
             }
         </script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
     <body x-data style="background-color: whitesmoke;">
         <header>
             <div class="title">neozot</div>
         </header>
-        <div
-            x-cloak
-            x-data="{suggested_items: [], 'isLoading': true}"
-            x-init="load_suggestions()
-                .then(results => { suggested_items = results; isLoading = false;})"
-            style="max-width:80%; margin: 6em auto;"
-        >
-            <div x-show="isLoading" id="loader"></div>
-            <template x-for="item in suggested_items">
-                <div x-data="item" class="card">
-                    <div class="card-title">
-                        <a x-bind:href="link" target="_blank">
-                            <h3 x-text="title"></h3>
-                        </a>
-                    </div>
-                    <div class="card-creators">
-                        <template x-for="creator in creators">
-                            <p x-text="creator" class="creator"></p>
-                        </template>
-                    </div>
-                    <div class="card-text">
-                        <div x-text="abstractNote"></div>
-                    </div>
-                    <div class="card-related">
-                        <p x-text="related.title" style="font-weight: bolder;"></p>
-                        <div x-text="related.abstractNote"></div>
-                        <p>Score = <em x-text="score"></em></p>
-                    </div>
-                </div>
-            </template>
+        <div class="sidenav">
+            <a href="#"><i class="fa fa-home"></i></a>
+            <a href="#" style="bottom: 5px; position: fixed">
+                <i class="fa fa-gear"></i>
+            </a>
         </div>
-
+        <div class="main">
+            <div
+                x-cloak
+                x-data="{suggested_items: [], 'isLoading': true}"
+                x-init="load_suggestions()
+                    .then(results => { suggested_items = results; isLoading = false;})"
+                style="max-width:80%; margin: 6em auto;"
+            >
+                <div x-show="isLoading" id="loader"></div>
+                <template x-for="item in suggested_items">
+                    <div x-data="item" class="card">
+                        <div class="card-title">
+                            <a x-bind:href="link" target="_blank">
+                                <h3 x-text="title"></h3>
+                            </a>
+                        </div>
+                        <div class="card-creators">
+                            <template x-for="creator in creators">
+                                <p x-text="creator" class="creator"></p>
+                            </template>
+                        </div>
+                        <div class="card-text">
+                            <div x-text="abstractNote"></div>
+                        </div>
+                        <div class="card-related">
+                            <p x-text="related.title" style="font-weight: bolder;"></p>
+                            <div x-text="related.abstractNote"></div>
+                            <p>Score = <em x-text="score"></em></p>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
     </body>
 </html>
