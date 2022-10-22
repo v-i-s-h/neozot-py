@@ -34,11 +34,16 @@ def main():
     force_refresh = args.force_refresh
 
     zotdb = ZoteroDB(datadir)
-    library = zotdb.get_library()
+    library = None # We will load after UI appears
     # display_items(library)
 
     @eel.expose
     def get_arxiv_suggestions():
+        nonlocal library
+        if library is None:
+            # If library is not loaded yet, then load
+            library = zotdb.get_library()
+        
         arxiv = ArxivFeedProvider(domains=arxivdomains)
         feed = arxiv.get_feed_summary(force_refresh=force_refresh)
         # display_items(feed)
