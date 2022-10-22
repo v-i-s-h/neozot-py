@@ -23,10 +23,10 @@ def main():
         help="""arxiv domain(s) to search in """
         """(Ex: cs.LG cs.CV cs.AI or high level as cs, math etc)""",
         nargs="+",
+        default=['cs']
     )
     parser.add_argument("-f", "--force-refresh", action="store_true")
     parser.set_defaults(force_refresh=False)
-    parser.add_argument("-o", "--outfile", default="feed.html")
     args = parser.parse_args()
 
     datadir = args.datadir
