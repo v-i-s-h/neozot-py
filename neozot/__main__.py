@@ -5,15 +5,14 @@
 import argparse
 import logging
 
+import eel
+
 from .zoterodb import ZoteroDB
 from .feedprovider import ArxivFeedProvider
 from .recommender import Recommender
 
-import eel
 
-
-@eel.expose
-def get_arxiv_suggestions():
+def main():    
     parser = argparse.ArgumentParser(
         prog="neozot", description="Super charge your research"
     )
@@ -38,17 +37,17 @@ def get_arxiv_suggestions():
     library = zotdb.get_library()
     # display_items(library)
 
-    arxiv = ArxivFeedProvider(domains=arxivdomains)
-    feed = arxiv.get_feed_summary(force_refresh=force_refresh)
-    # display_items(feed)
+    @eel.expose
+    def get_arxiv_suggestions():
+        arxiv = ArxivFeedProvider(domains=arxivdomains)
+        feed = arxiv.get_feed_summary(force_refresh=force_refresh)
+        # display_items(feed)
 
-    rec = Recommender()
-    suggested_items = rec.get_recommendations(library, feed, K=20)
+        rec = Recommender()
+        suggested_items = rec.get_recommendations(library, feed, K=5)
 
-    return suggested_items
+        return suggested_items
 
-
-def main():    
     eel.init("neozot/ui")
     eel.start("index.html")
 
