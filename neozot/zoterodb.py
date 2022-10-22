@@ -29,9 +29,17 @@ class ZoteroDB:
             raise OSError("No database found at: {}".format(self.db_dir))
 
         # Connect
-        self._connection = sqlite3.connect(db)
-        self._connection.row_factory = sqlite3.Row
-        logging.info("Connected to db")
+        try:
+            self._connection = sqlite3.connect(
+                "file:" + db + "?mode=ro", uri=True
+            )
+            self._connection.row_factory = sqlite3.Row
+            logging.info("Connected to db")
+        except:
+            logging.error(
+                "Unable to connect to db. Please close Zotero if running and try again"
+            )
+            raise
 
     def _load_collections(self):
         conn = self.connection
