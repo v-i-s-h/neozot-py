@@ -169,3 +169,38 @@ header {
   .sidenav {padding-top: 15px;}
   .sidenav a {font-size: 18px;}
 }
+
+
+.modal {
+  top: 20%;
+  position: fixed;
+  align-items: center;
+  justify-content: center;
+  z-index: 90;
+  width: 100%;
+  height: 100%;
+}
+
+.model-inner {
+  background-color: white;
+  border-radius: 0.5em;
+  max-width: 600px;
+  padding: 2em;
+  margin: auto;
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid black;
+}
+.overlay {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: black;
+  opacity: 0.75;
+  z-index: 89;
+}

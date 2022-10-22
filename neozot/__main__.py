@@ -38,18 +38,19 @@ def main():
     # display_items(library)
 
     @eel.expose
-    def get_arxiv_suggestions():
+    def get_arxiv_suggestions(domains, n_items=5):
+        print("Request: ", domains, n_items)
         nonlocal library
         if library is None:
             # If library is not loaded yet, then load
             library = zotdb.get_library()
         
-        arxiv = ArxivFeedProvider(domains=arxivdomains)
+        arxiv = ArxivFeedProvider(domains=domains)
         feed = arxiv.get_feed_summary(force_refresh=force_refresh)
         # display_items(feed)
 
         rec = Recommender()
-        suggested_items = rec.get_recommendations(library, feed, K=5)
+        suggested_items = rec.get_recommendations(library, feed, K=n_items)
 
         return suggested_items
 

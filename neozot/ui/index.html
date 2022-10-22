@@ -1,62 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>neozot</title>
-        <script type="text/javascript" src="eel.js"></script>
-        <script src="https://unpkg.com/alpinejs" defer></script>
-        <link rel="stylesheet" href="style.css">
-        <script>
-            async function load_suggestions() {
-                let suggested_items = await eel.get_arxiv_suggestions()();
-                return suggested_items;
-            }
-        </script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    </head>
-    <body x-data style="background-color: whitesmoke;">
-        <header>
-            <div class="title">neozot</div>
-        </header>
-        <div class="sidenav">
-            <a href="#"><i class="fa fa-home"></i></a>
-            <a href="#" style="bottom: 5px; position: fixed">
-                <i class="fa fa-gear"></i>
-            </a>
-        </div>
-        <div class="main">
-            <div
-                x-cloak
-                x-data="{suggested_items: [], 'isLoading': true}"
-                x-init="load_suggestions()
-                    .then(results => { suggested_items = results; isLoading = false;})"
-                style="max-width:80%; margin: 6em auto;"
-            >
-                <div x-show="isLoading" id="loader"></div>
-                <template x-for="item in suggested_items">
-                    <div x-data="item" class="card">
-                        <div class="card-title">
-                            <a x-bind:href="link" target="_blank">
-                                <h3 x-text="title"></h3>
-                            </a>
-                        </div>
-                        <div class="card-creators">
-                            <template x-for="creator in creators">
-                                <p x-text="creator" class="creator"></p>
-                            </template>
-                        </div>
-                        <div class="card-text">
-                            <div x-text="abstractNote"></div>
-                        </div>
-                        <div class="card-related">
-                            <p x-text="related.title" style="font-weight: bolder;"></p>
-                            <div x-text="related.abstractNote"></div>
-                            <p>Score = <em x-text="score"></em></p>
-                        </div>
-                    </div>
-                </template>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>neozot</title>
+    <script type="text/javascript" src="eel.js"></script>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        async function load_suggestions(n_items, domains) {
+            console.log("N =", n_items)
+            console.log("domains =", domains)
+            n_items = parseInt(n_items)
+            let _items = await eel.get_arxiv_suggestions(domains, n_items)();
+            window.dispatchEvent(
+                new CustomEvent(
+                    'items-load',
+                    {
+                        detail: {
+                            suggested_items: _items
+                        }
+                    }
+                )
+            )
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body x-data="{'isModalOpen': false, 'n_items': 5, 'isLoading': true, 'suggested_items': [], domains: ['cs']}"
+    x-on:keydown.escape="isModalOpen=false" 
+    x-on:items-load.window="suggested_items=$event.detail.suggested_items, isLoading=false"
+    style="background-color: whitesmoke;" x-init="load_suggestions(n_items, domains)">
+    <header>
+        <div class="title">neozot</div>
+    </header>
+    <div class="sidenav">
+        <a href="#"><i class="fa fa-home"></i></a>
+        <a href="#" style="bottom: 5px; position: fixed;">
+            <i class="fa fa-gear" x-on:click="isModalOpen = true"></i>
+        </a>
+    </div>
+    <div class="main">
+        <div class="modal" role="dialog" tabindex="-1" x-show="isModalOpen" x-cloak x-transition>
+            <div class="model-inner" x-on:click.away="isModalOpen=false">
+                <div class="modal-header">
+                    <h3>Settings</h3>
+                    <button aria-label="Close" x-on:click="isModalOpen=false">✖</button>
+                </div>
+                <div class="modal-body">
+                    Number of items: 
+                    <i x-text="n_items"></i>
+                    <input type="range" min="5" max="50" step="5" x-model="n_items">
+                    <br>
+                    <input type="checkbox" id="ax-cs" name="ax-cs" value="cs" x-model="domains">
+                    <label for="ax-cs">CS</label>
+                    <input type="checkbox" id="ax-math" name="ax-math" value="math" x-model="domains">
+                    <label for="ax-math">Math</label>
+                    <input type="checkbox" id="ax-stat" name="ax-stat" value="stat" x-model="domains">
+                    <label for="ax-stat">Stat</label>
+                </div>
+                <div class="modal-actions">
+                    <button x-on:click="
+                            suggested_items=[], isLoading=true, 
+                            isModalOpen=false,
+                            load_suggestions(n_items, domains)">
+                        Ok
+                    </button>
+                </div>
             </div>
         </div>
-    </body>
+        <div class="overlay" x-show="isModalOpen" x-cloak></div>
+        <div x-cloak style="max-width:80%; margin: 6em auto;">
+            <div x-show="isLoading" id="loader"></div>
+            <template x-for="item in suggested_items">
+                <div x-data="item" class="card">
+                    <div class="card-title">
+                        <a x-bind:href="link" target="_blank">
+                            <h3 x-text="title"></h3>
+                        </a>
+                    </div>
+                    <div class="card-creators">
+                        <template x-for="creator in creators">
+                            <p x-text="creator" class="creator"></p>
+                        </template>
+                    </div>
+                    <div class="card-text">
+                        <div x-text="abstractNote"></div>
+                    </div>
+                    <div class="card-related">
+                        <p x-text="related.title" style="font-weight: bolder;"></p>
+                        <div x-text="related.abstractNote"></div>
+                        <p>Score = <em x-text="score"></em></p>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+</body>
+
 </html>
