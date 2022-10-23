@@ -54,6 +54,14 @@ def main():
 
         return suggested_items
 
+    @eel.expose
+    def get_feed_items(domains=arxivdomains):
+        # Get all items from feeds
+        arxiv = ArxivFeedProvider(domains=domains)
+        feed = arxiv.get_feed_summary(force_refresh=force_refresh)
+
+        return feed
+
     eel.init("neozot/ui")
     eel.start("")
 

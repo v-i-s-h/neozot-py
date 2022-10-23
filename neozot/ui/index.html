@@ -23,6 +23,20 @@
                 )
             )
         }
+
+        async function load_feed(domains) {
+            let _items = await eel.get_feed_items(domains)();
+            window.dispatchEvent(
+                new CustomEvent(
+                    'items-load',
+                    {
+                        detail: {
+                            suggested_items: _items
+                        }
+                    }
+                )
+            )
+        }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
@@ -35,16 +49,29 @@
         <div class="title">neozot</div>
     </header>
     <div class="sidenav">
-        <a href="#"><i class="fa fa-inbox"></i></a>
-        <a href="#"><i class="fa fa-compass"></i></a>
-        <a href="#"><i class="fa fa-bookmark"></i></a>
+        <a href="#">
+            <i class="fa fa-inbox" 
+                x-on:click="suggested_items=[], isLoading=true, load_suggestions(n_items, domains)"
+                title="Suggestions"
+            ></i>
+        </a>
+        <a href="#">
+            <i class="fa fa-compass" 
+                x-on:click="suggested_items=[], isLoading=true, load_feed(domains)"
+                title="Explore all"
+            ></i>
+        </a>
+        <a href="#">
+            <i class="fa fa-bookmark" title="Bookmarked"></i>
+        </a>
         <a href="https://github.com/v-i-s-h/neozot-py/"
             target="_blank"
+            title="Github repo"
             style="bottom: 43px; position: fixed;">
             <i class="fa fa-github"></i>
         </a>
         <a href="#" style="bottom: 5px; position: fixed;">
-            <i class="fa fa-gear" x-on:click="isModalOpen = true"></i>
+            <i class="fa fa-gear" title="Settings" x-on:click="isModalOpen = true"></i>
         </a>
     </div>
     <div class="main">
@@ -77,7 +104,7 @@
             </div>
         </div>
         <div class="overlay" x-show="isModalOpen" x-cloak></div>
-        <div x-cloak style="max-width:80%; margin: 6em auto;">
+        <div x-cloak style="max-width:80%; margin: 6em auto;" x-data="{'related':false}">
             <div x-show="isLoading" id="loader"></div>
             <template x-for="item in suggested_items">
                 <div x-data="item" class="card">
@@ -94,11 +121,13 @@
                     <div class="card-text">
                         <div x-text="abstractNote"></div>
                     </div>
+                    <template x-if="related">
                     <div class="card-related">
                         <p x-text="related.title" style="font-weight: bolder;"></p>
                         <div x-text="related.abstractNote"></div>
                         <p>Score = <em x-text="score"></em></p>
                     </div>
+                    </template>
                 </div>
             </template>
         </div>
