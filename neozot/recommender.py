@@ -70,32 +70,27 @@ class Recommender:
         #       items x feeds
         # We find top K entries in the matrix to find top K pairs
 
-        # Get top K pairs
-        # Ref: https://stackoverflow.com/a/57105712
-        top_K = np.c_[
-            np.unravel_index(
-                np.argpartition(feed_similarity.ravel(), -K)[-K:],
-                feed_similarity.shape,
-            )
-        ]
+        # # Get top K pairs
+        # # Ref: https://stackoverflow.com/a/57105712
+        # top_K = np.c_[
+        #     np.unravel_index(
+        #         np.argpartition(feed_similarity.ravel(), -K)[-K:],
+        #         feed_similarity.shape,
+        #     )
+        # ]
 
-        recommendations = []
-        for i, j in top_K:
-            item_id = items_summary_ids[i]
-            feed_id = feed_summary_ids[j]
+        # recommendations = []
+        # for i, j in top_K:
+        #     item_id = items_summary_ids[i]
+        #     feed_id = feed_summary_ids[j]
 
-            # Deep copy is required, otherwise we will be modifying the original
-            # entry itself later
-            _item = deepcopy(feed[feed_id])
-            _item.update({"score": feed_similarity[i, j]})
-            _item.update({"related": deepcopy(library[item_id])})
+        #     # Deep copy is required, otherwise we will be modifying the original
+        #     # entry itself later
+        #     _item = deepcopy(feed[feed_id])
+        #     _item.update({"score": feed_similarity[i, j]})
+        #     _item.update({"related": deepcopy(library[item_id])})
 
-            recommendations.append(_item)
-
-        # sort according to score
-        recommendations = sorted(
-            recommendations, key=lambda x: x["score"], reverse=True
-        )
+        #     recommendations.append(_item)
 
         ## Alternative scoring
         scores = feed_similarity.sum(axis=0)
