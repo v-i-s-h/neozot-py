@@ -1,6 +1,9 @@
 # Recommendation engine
 
+import os
+import sqlite3
 import logging
+import pickle
 from copy import deepcopy
 
 import numpy as np
@@ -34,6 +37,43 @@ class Recommender:
             use_idf=True,
         )
 
+        self.db_dir = "data"
+        self._connection = None
+        self._cursor = None
+
+        # self._connect_db()
+
+    def _connect_db(self):
+        db = os.path.join(self.db_dir, "neozot.sqlite")
+        # if not os.path.exists(db):
+        #     raise OSError("No database found at: {}".format(self.db_dir))
+
+        # Connect
+        try:
+            self._connection = sqlite3.connect("file:" + db, uri=True)
+            self._connection.row_factory = sqlite3.Row
+            logging.info("Connected to db")
+
+            # # Create tables
+            # self._connection.execute('''
+            #     CREATE TABLE IF NOT EXISTS library
+            #     (itemID INTEGER PRIMARY KEY, 
+            #      title TEXT,
+            #      embedding BLOB)
+            # ''')
+
+            # self._connection.execute('''
+            #     CREATE TABLE IF NOT EXISTS feed
+            #     (feedID TEXT PRIMARY KEY, 
+            #      title TEXT,
+            #      embedding BLOB)
+            # ''')
+        except:
+            logging.error(
+                "Unable to connect to neozot db."
+            )
+            raise
+
     def get_recommendations(self, library, feed, K=10):
         # Build a summary of each item, only if it has abstract
         items_summary = build_summary(library)
@@ -64,6 +104,28 @@ class Recommender:
 
         items_embedding = self.encoder.fit_transform(items_summary_values)
         feed_embedding = self.encoder.transform(feed_summary_values)
+
+        # # ---------
+        # # Writeout to neozot db
+        # for idx, itemId in enumerate(items_summary_ids):
+        #     self.cursor.execute('''
+        #         INSERT INTO library (itemID, title, embedding)
+        #         VALUES (?, ?, ?)
+        #     ''', (itemId, 
+        #           library[itemId]['title'],
+        #           pickle.dumps(items_embedding[idx, :])))
+        # self.connection.commit()
+
+        # for idx, feedId in enumerate(feed_summary_ids):
+        #     self.cursor.execute('''
+        #         INSERT INTO feed (feedID, title, embedding)
+        #         VALUES (?, ?, ?)
+        #     ''', (feedId, 
+        #           feed[feedId]['title'],
+        #           pickle.dumps(feed_embedding[idx, :])))
+        #     print("Wrote", feedId, feed[feedId]['title'])
+        # self.connection.commit()
+        # # ---------
 
         feed_similarity = similarity(items_embedding, feed_embedding)
         # Feed similarity matrix is a matrix of dimension
@@ -99,7 +161,7 @@ class Recommender:
         recommendations = []
         for idx in top_K:
             feed_id = feed_summary_ids[idx]
-            
+
             _item = deepcopy(feed[feed_id])
             _item.update({"score": scores[idx]})
             _item.update({"related": ""})
@@ -127,3 +189,17 @@ class Recommender:
         #     print("{:120s}  {:30s}".format(info["title"], info["link"]))
 
         return recommendations
+
+    @property
+    def connection(self):
+        if self._connection is None:
+            # attempt to connect
+            self._connect_db()
+
+        return self._connection
+
+    @property
+    def cursor(self):
+        if self._cursor is None:
+            self._cursor = self.connection.cursor()
+        return self._cursor
