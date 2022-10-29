@@ -9,15 +9,21 @@
     <script src="https://unpkg.com/alpinejs" defer></script>
     <link rel="stylesheet" href="style.css">
     <script>
-        async function load_suggestions(n_items, domains) {
-            n_items = parseInt(n_items)
-            let _items = await eel.get_arxiv_suggestions(domains, n_items)();
+        async function load_suggestions(n_items=null, domains=null) {
+            if (n_items !== null) {
+                n_items = parseInt(n_items)
+            }
+            let [_n_items, _domains, _items] = await eel.get_arxiv_suggestions(
+                domains, n_items
+            )();
             window.dispatchEvent(
                 new CustomEvent(
                     'items-load',
                     {
                         detail: {
-                            suggested_items: _items
+                            suggested_items: _items,
+                            n_items: _n_items,
+                            domains: _domains
                         }
                     }
                 )
@@ -28,7 +34,7 @@
             let _items = await eel.get_feed_items(domains)();
             window.dispatchEvent(
                 new CustomEvent(
-                    'items-load',
+                    'feed-load',
                     {
                         detail: {
                             suggested_items: _items
@@ -41,23 +47,47 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
-<body x-data="{'isModalOpen': false, 'n_items': 5, 'isLoading': true, 'suggested_items': [], domains: ['cs']}"
+<body x-data="{
+        'isModalOpen': false, 
+        'n_items': 10, 
+        'isLoading': true, 
+        'suggested_items': [], 
+        'domains': null
+    }"
     x-on:keydown.escape="isModalOpen=false" 
-    x-on:items-load.window="suggested_items=$event.detail.suggested_items, isLoading=false"
-    style="background-color: whitesmoke;" x-init="load_suggestions(n_items, domains)">
+    x-on:items-load.window="
+        suggested_items=$event.detail.suggested_items,
+        n_items=$event.detail.n_items,
+        domains=$event.detail.domains,
+        isLoading=false
+    "
+    x-on:feed-load.window="
+        suggested_items=$event.detail.suggested_items,
+        isLoading=false
+    "
+    style="background-color: whitesmoke;" 
+    x-init="load_suggestions()">
     <header>
         <div class="title">neozot</div>
     </header>
     <div class="sidenav">
         <a href="#">
             <i class="fa fa-inbox" 
-                x-on:click="suggested_items=[], isLoading=true, load_suggestions(n_items, domains)"
+                x-on:click="
+                    suggested_items=[],
+                    isLoading=true,
+                    load_suggestions(n_items, domains)
+                "
                 title="Suggestions"
             ></i>
         </a>
         <a href="#">
             <i class="fa fa-compass" 
-                x-on:click="suggested_items=[], isLoading=true, load_feed(domains)"
+                x-on:click="
+                    suggested_items=[],
+                    isLoading=true,
+                    load_feed(domains)
+                "
                 title="Explore all"
             ></i>
         </a>
