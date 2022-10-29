@@ -28,7 +28,12 @@ def load_update_pref(pref_file, prefs_given):
         preferences with missing updated from file
 
     """
-    prefs = {}
+
+    # Hard code defaults
+    prefs = {
+        'domains': ['cs'],
+        'n_items': 10,
+    }
 
     # Bit cleaning to avoid wrong updates
     ## 1. if zotdir is not given, remove key
@@ -102,27 +107,27 @@ def main():
         return # Exit from main
 
     zotdir = prefs['zotdir']
-    domains = prefs.get('domains', ['cs']) # Hard code default values
     force_refresh = prefs.get('force_refresh', False)
-    n_items = prefs['n_items']
-
+    
     zotdb = ZoteroDB(zotdir)
-    library = None  # We will load after UI appears
+    library = {}  # We will load after UI appears
     # display_items(library)
 
     @eel.expose
-    def get_arxiv_suggestions(domains=domains, n_items=n_items):
-        nonlocal library, preferences_json
-
+    def get_arxiv_suggestions(domains, n_items):
+        nonlocal library
+        
         # update prefs if required
         _prefs = load_update_pref(preferences_json, {
             'domains': domains,
             'n_items': n_items
         })
+
+        # Error check
         domains = _prefs['domains']
         n_items = _prefs['n_items']
 
-        if library is None:
+        if not library:
             # If library is not loaded yet, then load
             library = zotdb.get_library()
 
@@ -135,7 +140,7 @@ def main():
         return n_items, domains, suggested_items
 
     @eel.expose
-    def get_feed_items(domains=domains):
+    def get_feed_items(domains):
         # Get all items from feeds
         arxiv = ArxivFeedProvider(domains=domains)
         feed = arxiv.get_feed_summary(force_refresh=force_refresh)
