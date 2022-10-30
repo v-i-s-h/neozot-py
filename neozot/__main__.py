@@ -97,6 +97,7 @@ def main():
     os.makedirs(appdir.user_cache_dir, exist_ok=True)
     preferences_json = os.path.join(appdir.user_config_dir, "prefs.json")
     neozot_db = os.path.join(appdir.user_cache_dir, "neozot.sqlite")
+    feeddir = os.path.join(appdir.user_cache_dir, "feeds")
     prefs = load_update_pref(preferences_json, vars(args))
 
     if 'zotdir' not in prefs:
@@ -131,7 +132,7 @@ def main():
             # If library is not loaded yet, then load
             library = zotdb.get_library()
 
-        arxiv = ArxivFeedProvider(domains=domains)
+        arxiv = ArxivFeedProvider(domains=domains, feeddir=feeddir)
         feed = arxiv.get_feed_summary(force_refresh=force_refresh)
 
         rec = Recommender()
@@ -147,7 +148,9 @@ def main():
 
         return feed
 
-    eel.init("neozot/ui")
+    # Start eel server
+    this_dir, _ = os.path.split(__file__)
+    eel.init(os.path.join(this_dir, "ui"))
     eel.start("")
 
 

@@ -23,7 +23,7 @@ def build_summary(library):
 
 
 class Recommender:
-    def __init__(self):
+    def __init__(self, neozotdb="neozotdb.sqlite"):
         # Create feature builder
         self.encoder = TfidfVectorizer(
             input="content",
@@ -32,25 +32,21 @@ class Recommender:
             analyzer="word",
             stop_words="english",
             max_df=0.20,
-            min_df=0.02,
+            min_df=0.04,
             norm="l2",
             use_idf=True,
         )
 
-        self.db_dir = "data"
+        self.neozotdb = neozotdb
         self._connection = None
         self._cursor = None
 
         # self._connect_db()
 
     def _connect_db(self):
-        db = os.path.join(self.db_dir, "neozot.sqlite")
-        # if not os.path.exists(db):
-        #     raise OSError("No database found at: {}".format(self.db_dir))
-
         # Connect
         try:
-            self._connection = sqlite3.connect("file:" + db, uri=True)
+            self._connection = sqlite3.connect("file:" + self.neozotdb, uri=True)
             self._connection.row_factory = sqlite3.Row
             logging.info("Connected to db")
 
