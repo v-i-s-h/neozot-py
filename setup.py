@@ -6,7 +6,7 @@ with open('README.md') as read_me:
 
 setup(
     name='neozot',
-    version='0.0.4',
+    version='0.0.5',
     author='Vishnu Raj',
     author_email='rajvishnu@duck.com',
     url='https://github.com/v-i-s-h/neozot-py/',
