@@ -143,7 +143,7 @@ def main():
     @eel.expose
     def get_feed_items(domains):
         # Get all items from feeds
-        arxiv = ArxivFeedProvider(domains=domains)
+        arxiv = ArxivFeedProvider(domains=domains, feeddir=feeddir)
         feed = arxiv.get_feed_summary(force_refresh=force_refresh)
 
         return feed
